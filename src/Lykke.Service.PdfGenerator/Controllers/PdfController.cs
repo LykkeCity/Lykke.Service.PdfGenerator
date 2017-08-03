@@ -30,6 +30,9 @@ namespace Lykke.Service.PdfGenerator.Controllers
             if (model == null || string.IsNullOrWhiteSpace(model.HtmlSource))
                 return BadRequest("Please provide HtmlSource data.");
 
+            //var agrEx = new AggregateException("Test exception", new NotImplementedException("InnerEx1"), new NotImplementedException("InnerEx2"), new NotImplementedException("InnerEx3"));
+            //var errMessages = GetAllExceptions(agrEx).Distinct().ToList();
+
             try
             {
                 byte[] data = null;
@@ -48,8 +51,37 @@ namespace Lykke.Service.PdfGenerator.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(HttpStatusCode.InternalServerError);
+                var errors = GetAllExceptions(ex).Distinct().ToList();
+                return Json(new { Errors = errors });
+                //return StatusCode(HttpStatusCode.InternalServerError);
             }
+        }
+
+        private List<string> GetAllExceptions(Exception ex, List<string> strExceptions = null)
+        {
+            if (ex == null)
+                return strExceptions;
+
+            if (strExceptions == null)
+                strExceptions = new List<string>();
+
+            var aggregateException = ex as AggregateException;
+            if (aggregateException != null)
+            {
+                foreach (var innerEx in aggregateException.InnerExceptions)
+                {
+                    strExceptions.AddRange(GetAllExceptions(innerEx, strExceptions));
+                }
+            }
+            else
+            {
+                strExceptions.Add(ex.ToString());
+            }
+
+            if (ex.InnerException != null)
+                strExceptions.AddRange(GetAllExceptions(ex.InnerException, strExceptions));
+
+            return strExceptions;
         }
 
         private async Task StoreDataAsync(byte[] data, string blobName)
