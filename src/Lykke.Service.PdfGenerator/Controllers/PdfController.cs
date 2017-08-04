@@ -10,6 +10,7 @@ using System.Web.Http;
 
 using Microsoft.WindowsAzure.Storage; 
 using Microsoft.Azure;
+using SelectPdf;
 
 namespace Lykke.Service.PdfGenerator.Controllers
 {
@@ -38,8 +39,21 @@ namespace Lykke.Service.PdfGenerator.Controllers
                 byte[] data = null;
                 using (MemoryStream ms = new MemoryStream())
                 {
-                    var pdf = TheArtOfDev.HtmlRenderer.PdfSharp.PdfGenerator.GeneratePdf(model.HtmlSource, PdfSharp.PageSize.A4, 0);
-                    pdf.Save(ms);
+                    // instantiate a html to pdf converter object
+                    HtmlToPdf converter = new HtmlToPdf();
+
+                    // set converter options
+                    converter.Options.PdfPageSize = PdfPageSize.A4;
+                    converter.Options.PdfPageOrientation = PdfPageOrientation.Portrait;
+
+                    // create a new pdf document converting an html string
+                    PdfDocument doc = converter.ConvertHtmlString(model.HtmlSource);
+
+                    // save pdf document
+                    doc.Save(ms);
+
+                    // close pdf document
+                    doc.Close();
                     data = ms.ToArray();
                 }
 
