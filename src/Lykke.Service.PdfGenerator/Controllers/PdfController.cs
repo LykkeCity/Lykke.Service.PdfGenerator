@@ -8,9 +8,12 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 
-using Microsoft.WindowsAzure.Storage; 
+using Microsoft.WindowsAzure.Storage;
 using Microsoft.Azure;
-using SelectPdf;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
+//using SelectPdf;
+
 
 namespace Lykke.Service.PdfGenerator.Controllers
 {
@@ -37,29 +40,31 @@ namespace Lykke.Service.PdfGenerator.Controllers
             try
             {
                 byte[] data = null;
-                using (MemoryStream ms = new MemoryStream())
-                {
-                    // instantiate a html to pdf converter object
-                    HtmlToPdf converter = new HtmlToPdf();
+                //using (MemoryStream ms = new MemoryStream())
+                //{
+                //    // instantiate a html to pdf converter object
+                //    HtmlToPdf converter = new HtmlToPdf();
 
-                    // set converter options
-                    converter.Options.PdfPageSize = PdfPageSize.A4;
-                    converter.Options.PdfPageOrientation = PdfPageOrientation.Portrait;
+                //    // set converter options
+                //    converter.Options.PdfPageSize = PdfPageSize.A4;
+                //    converter.Options.PdfPageOrientation = PdfPageOrientation.Portrait;
 
-                    // create a new pdf document converting an html string
-                    PdfDocument doc = converter.ConvertHtmlString(model.HtmlSource);
+                //    // create a new pdf document converting an html string
+                //    PdfDocument doc = converter.ConvertHtmlString(model.HtmlSource);
 
-                    // save pdf document
-                    doc.Save(ms);
+                //    // save pdf document
+                //    doc.Save(ms);
 
-                    // close pdf document
-                    doc.Close();
-                    data = ms.ToArray();
-                }
+                //    // close pdf document
+                //    doc.Close();
+                //    data = ms.ToArray();
+                //}
+
+                data = GeneratePdfByItext(model.HtmlSource);
 
                 var blobName = Guid.NewGuid().ToString();
                 await StoreDataAsync(data, blobName);
-                
+
 
                 return Json(new { BlobContainer = _containerName, BlobName = blobName });
             }
@@ -69,6 +74,79 @@ namespace Lykke.Service.PdfGenerator.Controllers
                 return Json(new { Errors = errors });
                 //return StatusCode(HttpStatusCode.InternalServerError);
             }
+        }
+
+        private byte[] GeneratePdfByItext(string htmlSource)
+        {//Create a byte array that will eventually hold our final PDF
+            Byte[] bytes;
+
+            //Boilerplate iTextSharp setup here
+            //Create a stream that we can write to, in this case a MemoryStream
+            using (var ms = new MemoryStream())
+            {
+
+                //Create an iTextSharp Document which is an abstraction of a PDF but **NOT** a PDF
+                using (var doc = new Document())
+                {
+
+                    //Create a writer that's bound to our PDF abstraction and our stream
+                    using (var writer = PdfWriter.GetInstance(doc, ms))
+                    {
+
+                        //Open the document for writing
+                        doc.Open();
+
+                        ////Our sample HTML and CSS
+                        //var example_html = @"<p>This <em>is </em><span class=""headline"" style=""text-decoration: underline;"">some</span> <strong>sample <em> text</em></strong><span style=""color: red;"">!!!</span></p>";
+                        //var example_css = @".headline{font-size:200%}";
+
+
+                        /**************************************************
+                         * Example #2                                     *
+                         *                                                *
+                         * Use the XMLWorker to parse the HTML.           *
+                         * Only inline CSS and absolutely linked          *
+                         * CSS is supported                               *
+                         * ************************************************/
+
+                        //XMLWorker also reads from a TextReader and not directly from a string
+                        using (var srHtml = new StringReader(htmlSource))
+                        {
+
+                            //Parse the HTML
+                            iTextSharp.tool.xml.XMLWorkerHelper.GetInstance().ParseXHtml(writer, doc, srHtml);
+                        }
+
+                        ///**************************************************
+                        // * Example #3                                     *
+                        // *                                                *
+                        // * Use the XMLWorker to parse HTML and CSS        *
+                        // * ************************************************/
+
+                        ////In order to read CSS as a string we need to switch to a different constructor
+                        ////that takes Streams instead of TextReaders.
+                        ////Below we convert the strings into UTF8 byte array and wrap those in MemoryStreams
+                        //using (var msCss = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(example_css)))
+                        //{
+                        //    using (var msHtml = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(example_html)))
+                        //    {
+
+                        //        //Parse the HTML
+                        //        iTextSharp.tool.xml.XMLWorkerHelper.GetInstance().ParseXHtml(writer, doc, msHtml, msCss);
+                        //    }
+                        //}
+
+
+                        doc.Close();
+                    }
+                }
+
+                //After all of the PDF "stuff" above is done and closed but **before** we
+                //close the MemoryStream, grab all of the active bytes from the stream
+                bytes = ms.ToArray();
+            }
+
+            return bytes;
         }
 
         private List<string> GetAllExceptions(Exception ex, List<string> strExceptions = null)
@@ -105,7 +183,7 @@ namespace Lykke.Service.PdfGenerator.Controllers
             var blobClient = storageAccount.CreateCloudBlobClient();
             var container = blobClient.GetContainerReference(_containerName);
             container.CreateIfNotExists();
-            
+
             var blockBlob = container.GetBlockBlobReference(blobName);
             await blockBlob.UploadFromByteArrayAsync(data, 0, data.Length);
         }
