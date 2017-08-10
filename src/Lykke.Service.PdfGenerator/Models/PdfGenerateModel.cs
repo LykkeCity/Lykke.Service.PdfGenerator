@@ -8,5 +8,7 @@ namespace Lykke.Service.PdfGenerator.Models
     public class PdfGenerateModel
     {
         public string HtmlSource { get; set; }
+        public string BlobName { get; set; }
+        public string FileName { get; set; }
     }
 }

@@ -38,10 +38,10 @@ namespace Lykke.Service.PdfGenerator.Controllers
                 byte[] data = null;
                 data = GeneratePdfByItext(model.HtmlSource);
 
-                var blobName = Guid.NewGuid().ToString();
-                await StoreDataAsync(data, blobName);
-
-
+                var blobName = model.BlobName ?? Guid.NewGuid().ToString();
+                var fileName = model.FileName ?? $"{blobName}.pdf";
+                await StoreDataAsync(data, blobName, fileName);
+                
                 return Json(new { BlobContainer = _containerName, BlobName = blobName });
             }
             catch (Exception ex)
@@ -110,7 +110,7 @@ namespace Lykke.Service.PdfGenerator.Controllers
             return strExceptions;
         }
 
-        private async Task StoreDataAsync(byte[] data, string blobName)
+        private async Task StoreDataAsync(byte[] data, string blobName, string fileName)
         {
             var storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("BlobConnectionString"));
 
@@ -119,6 +119,8 @@ namespace Lykke.Service.PdfGenerator.Controllers
             container.CreateIfNotExists();
 
             var blockBlob = container.GetBlockBlobReference(blobName);
+            blockBlob.Metadata["fileName"] = fileName;
+            await blockBlob.SetMetadataAsync();
             await blockBlob.UploadFromByteArrayAsync(data, 0, data.Length);
         }
     }
