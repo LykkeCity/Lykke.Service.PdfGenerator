@@ -120,7 +120,8 @@ namespace Lykke.Service.PdfGenerator.Controllers
 
             var blockBlob = container.GetBlockBlobReference(blobName);
             blockBlob.Metadata["fileName"] = fileName;
-            //await blockBlob.SetMetadataAsync();
+            blockBlob.Properties.ContentType = "application/pdf";
+
             await blockBlob.UploadFromByteArrayAsync(data, 0, data.Length);
         }
     }
