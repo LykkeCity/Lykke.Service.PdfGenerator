@@ -46,6 +46,7 @@ _UpgradeReport_Files/
 
 #ncrunch
 *.*crunch*
+_NCrunch_*
 
 #publish profiles
 *publish.ps1
@@ -54,22 +55,7 @@ _UpgradeReport_Files/
 
 #some test
 .vs
-/deploy
-/settings
-TestResult.xml
-#include compiled contracts
-!/src/EthereumContractBuilder/contracts/bin/
 node_modules
-**/launchsettings.json
-**/appsettings.dev.json
-**/docker-compose.dev.yml
-
-/src/BackOffice/Scripts/*.js
-/src/BackOffice/Scripts/.js
-/src/BackOffice/wwwroot/fonts
-/src/BackOffice/wwwroot/output
-/src/BackOffice/wwwroot/js
-/src/BackOffice/Scripts/*.js.map
-app/
-**/UseDevelopmentStorage=true
-.Development.json
+**/launchSettings.json
+**/appsettings.json
+**/appsettings.*.json
