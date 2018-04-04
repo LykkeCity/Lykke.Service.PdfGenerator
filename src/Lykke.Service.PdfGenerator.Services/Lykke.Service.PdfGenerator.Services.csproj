@@ -8,6 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="itext7" Version="7.1.1" />
+    <PackageReference Include="itext7.pdfhtml" Version="2.0.1" />
     <PackageReference Include="Lykke.Common" Version="6.1.1" />
   </ItemGroup>
 

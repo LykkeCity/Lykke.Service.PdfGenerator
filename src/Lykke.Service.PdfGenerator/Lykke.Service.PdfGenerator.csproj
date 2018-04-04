@@ -43,6 +43,7 @@
   
   <ItemGroup>
     <ProjectReference Include="..\Lykke.Service.PdfGenerator.AzureRepositories\Lykke.Service.PdfGenerator.AzureRepositories.csproj" />
+    <ProjectReference Include="..\Lykke.Service.PdfGenerator.Contract\Lykke.Service.PdfGenerator.Contract.csproj" />
     <ProjectReference Include="..\Lykke.Service.PdfGenerator.Core\Lykke.Service.PdfGenerator.Core.csproj" />
     <ProjectReference Include="..\Lykke.Service.PdfGenerator.Services\Lykke.Service.PdfGenerator.Services.csproj" />
   </ItemGroup>

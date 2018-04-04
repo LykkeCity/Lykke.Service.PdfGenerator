@@ -6,5 +6,6 @@ namespace Lykke.Service.PdfGenerator.Settings.ServiceSettings
     public class PdfGeneratorSettings
     {
         public DbSettings Db { get; set; }
+        public string PdfBlobContainer { get; set; }
     }
 }

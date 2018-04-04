@@ -1,9 +1,12 @@
 ﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using AzureStorage.Blob;
 using Common.Log;
+using Lykke.Service.PdfGenerator.AzureRepositories;
+using Lykke.Service.PdfGenerator.Core.Repositories;
 using Lykke.Service.PdfGenerator.Core.Services;
-using Lykke.Service.PdfGenerator.Settings.ServiceSettings;
 using Lykke.Service.PdfGenerator.Services;
+using Lykke.Service.PdfGenerator.Settings.ServiceSettings;
 using Lykke.SettingsReader;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -46,9 +49,21 @@ namespace Lykke.Service.PdfGenerator.Modules
             builder.RegisterType<ShutdownManager>()
                 .As<IShutdownManager>();
 
-            // TODO: Add your dependencies here
+            BuildRepositories(builder);
+
+            builder.RegisterType<PdfGeneratorService>().As<IPdfGeneratorService>();
 
             builder.Populate(_services);
+        }
+
+        private void BuildRepositories(ContainerBuilder builder)
+        {
+            builder.RegisterInstance<IPdfGeneratorRepository>(new PdfGeneratorRepository(
+                _settings.CurrentValue.Db.BlobConnectionString,
+                AzureBlobStorage.Create(_settings.ConnectionString(x => x.Db.BlobConnectionString)),
+                _log,
+                _settings.CurrentValue.PdfBlobContainer
+            ));
         }
     }
 }
