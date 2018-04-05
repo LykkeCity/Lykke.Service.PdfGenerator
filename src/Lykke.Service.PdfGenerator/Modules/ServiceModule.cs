@@ -49,9 +49,13 @@ namespace Lykke.Service.PdfGenerator.Modules
             builder.RegisterType<ShutdownManager>()
                 .As<IShutdownManager>();
 
+            builder.RegisterInstance(_settings.CurrentValue).SingleInstance();
+
             BuildRepositories(builder);
 
-            builder.RegisterType<PdfGeneratorService>().As<IPdfGeneratorService>();
+            builder.RegisterType<PdfGeneratorService>()
+                .As<IPdfGeneratorService>()
+                .SingleInstance();
 
             builder.Populate(_services);
         }
@@ -59,9 +63,7 @@ namespace Lykke.Service.PdfGenerator.Modules
         private void BuildRepositories(ContainerBuilder builder)
         {
             builder.RegisterInstance<IPdfGeneratorRepository>(new PdfGeneratorRepository(
-                _settings.CurrentValue.Db.BlobConnectionString,
                 AzureBlobStorage.Create(_settings.ConnectionString(x => x.Db.BlobConnectionString)),
-                _log,
                 _settings.CurrentValue.PdfBlobContainer
             ));
         }

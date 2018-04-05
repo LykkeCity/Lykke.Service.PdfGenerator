@@ -7,7 +7,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
-using Common;
 
 namespace Lykke.Service.PdfGenerator.Services
 {
@@ -15,6 +14,7 @@ namespace Lykke.Service.PdfGenerator.Services
     {
         private readonly IPdfGeneratorRepository _pdfGeneratorRepository;
         private readonly ILog _log;
+        private const string PdfMimeType = ".pdf";
 
         public PdfGeneratorService(
             IPdfGeneratorRepository pdfGeneratorRepository,
@@ -25,17 +25,27 @@ namespace Lykke.Service.PdfGenerator.Services
         }
 
         /// <inheritdoc />
-        public async Task<string> Generate(string htmlSource, string blobName = null, string fileName = null)
+        public async Task<string> Generate(string htmlSource, string blobName, string fileName)
         {
+            if (string.IsNullOrEmpty(blobName))
+                blobName = Guid.NewGuid().ToString();
+
+            if (blobName.LastIndexOf(PdfMimeType, StringComparison.InvariantCultureIgnoreCase) == -1)
+                blobName += PdfMimeType;
+
+            if (string.IsNullOrEmpty(fileName))
+                fileName = blobName;
+
+            _log.WriteInfo(nameof(GeneratePdfByItext7), new {blobName, fileName} , "Started");
             var sw = new Stopwatch();
             sw.Start();
-
+            
             var data = GeneratePdfByItext7(htmlSource);
-
+            await _pdfGeneratorRepository.StoreDataAsync(data, blobName, fileName);
+            
             sw.Stop();
-            _log.WriteInfo(nameof(GeneratePdfByItext7), blobName, new {ExecutedTime = sw.ElapsedMilliseconds}.ToJson());
+            _log.WriteInfo(nameof(GeneratePdfByItext7), new { blobName, fileName, ElapsedTime = sw.ElapsedMilliseconds }, "Finished");
 
-            await _pdfGeneratorRepository.StoreDataAsync(data, blobName ?? Guid.NewGuid().ToString(), fileName);
             return blobName;
         }
 

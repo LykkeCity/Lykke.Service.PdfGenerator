@@ -4,6 +4,6 @@ namespace Lykke.Service.PdfGenerator.Core.Repositories
 {
     public interface IPdfGeneratorRepository
     {
-        Task StoreDataAsync(byte[] data, string blobName, string fileName = null);
+        Task StoreDataAsync(byte[] data, string blobName, string fileName);
     }
 }

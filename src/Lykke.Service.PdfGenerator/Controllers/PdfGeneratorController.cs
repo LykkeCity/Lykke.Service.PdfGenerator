@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Lykke.Service.PdfGenerator.Settings.ServiceSettings;
 
 namespace Lykke.Service.PdfGenerator.Controllers
 {
@@ -17,13 +18,16 @@ namespace Lykke.Service.PdfGenerator.Controllers
     public class PdfGeneratorController : Controller
     {
         private readonly IPdfGeneratorService _pdfGeneratorService;
+        private readonly PdfGeneratorSettings _settings;
         private readonly ILog _log;
 
         public PdfGeneratorController(
             IPdfGeneratorService pdfGeneratorService,
-            ILog log)
+            ILog log,
+            PdfGeneratorSettings settings)
         {
             _pdfGeneratorService = pdfGeneratorService;
+            _settings = settings;
             _log = log.CreateComponentScope(nameof(PdfGeneratorController));
         }
 
@@ -36,7 +40,7 @@ namespace Lykke.Service.PdfGenerator.Controllers
         [HttpPost("generate")]
         [SwaggerOperation("Generate")]
         [ProducesResponseType(typeof(PdfGenerateResponse), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(PdfGenerateErrorResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> Generate([FromBody] PdfGenerateModel model)
         {
             if (string.IsNullOrWhiteSpace(model?.HtmlSource))
@@ -45,13 +49,18 @@ namespace Lykke.Service.PdfGenerator.Controllers
             try
             {
                 var blobName = await _pdfGeneratorService.Generate(model.HtmlSource, model.BlobName, model.FileName);
-                return Ok(new PdfGenerateResponse {BlobName = blobName});
+                return Ok(new PdfGenerateResponse
+                {
+                    BlobContainer = _settings.PdfBlobContainer,
+                    BlobName = blobName
+                });
             }
             catch (Exception ex)
             {
                 _log.WriteError(nameof(Generate), model, ex);
                 var errors = GetAllExceptions(ex).Distinct().ToList();
-                return StatusCode(500, new {Errors = errors}.ToJson());
+                return StatusCode((int) HttpStatusCode.InternalServerError,
+                    new PdfGenerateErrorResponse {Errors = errors}.ToJson());
             }
         }
 
