@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <AssemblyName>Lykke.Service.PdfGenerator.AzureRepositories</AssemblyName>
+    <RootNamespace>Lykke.Service.PdfGenerator.AzureRepositories</RootNamespace>
+    <Version>1.0.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Lykke.AzureStorage" Version="8.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Lykke.Service.PdfGenerator.Core\Lykke.Service.PdfGenerator.Core.csproj" />
+  </ItemGroup>
+
+</Project>
