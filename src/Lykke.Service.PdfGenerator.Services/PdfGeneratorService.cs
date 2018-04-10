@@ -7,6 +7,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
+using Lykke.Service.PdfGenerator.Contract;
 
 namespace Lykke.Service.PdfGenerator.Services
 {
@@ -47,6 +48,21 @@ namespace Lykke.Service.PdfGenerator.Services
             _log.WriteInfo(nameof(GeneratePdfByItext7), new { blobName, fileName, ElapsedTime = sw.ElapsedMilliseconds }, "Finished");
 
             return blobName;
+        }
+
+        public async Task<PdfDataResponse> GetData(string blobName)
+        {
+            var result = await _pdfGeneratorRepository.GetDataAsync(blobName);
+            return new PdfDataResponse()
+            {
+                Data = result.Data,
+                FileName = result.FileName
+            };
+        }
+
+        public async Task<bool> IsExist(string blobName)
+        {
+            return await _pdfGeneratorRepository.IsExistAsync(blobName);
         }
 
         private static byte[] GeneratePdfByItext7(string htmlSource)

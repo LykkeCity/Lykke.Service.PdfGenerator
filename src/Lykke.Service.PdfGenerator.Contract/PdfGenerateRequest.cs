@@ -1,6 +1,6 @@
 ﻿namespace Lykke.Service.PdfGenerator.Contract
 {
-    public class PdfGenerateModel
+    public class PdfGenerateRequest
     {
         /// <summary>
         /// HTML which should be converted to PDF

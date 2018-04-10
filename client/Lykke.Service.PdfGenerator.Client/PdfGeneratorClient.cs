@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Common.Log;
+using Lykke.Service.PdfGenerator.Contract;
 
 namespace Lykke.Service.PdfGenerator.Client
 {
@@ -18,6 +20,16 @@ namespace Lykke.Service.PdfGenerator.Client
             //    return;
             //_service.Dispose();
             //_service = null;
+        }
+
+        public Task<PdfDataResponse> GetData(string blobName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> IsExist(string blobName)
+        {
+            throw new NotImplementedException();
         }
     }
 }

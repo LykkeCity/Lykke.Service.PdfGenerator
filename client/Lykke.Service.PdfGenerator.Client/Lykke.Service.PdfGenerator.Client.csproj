@@ -33,4 +33,8 @@
     <Folder Include="Models\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Lykke.Service.PdfGenerator.Contract\Lykke.Service.PdfGenerator.Contract.csproj" />
+  </ItemGroup>
+
 </Project>
