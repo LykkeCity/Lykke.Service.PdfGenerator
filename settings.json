@@ -1,0 +1,20 @@
+{
+  "PdfGeneratorService": 
+  {
+    "Db": 
+    {
+      "BlobConnectionString": "${PdfGeneratorServiceConnStr}",
+      "LogsConnString": "${PdfGeneratorServiceLogsConnStr}"
+    },
+    "PdfBlobContainer": "${PdfGeneratorServiceBlobContainer}"
+  },
+  "SlackNotifications": 
+  {
+    "AzureQueue": 
+    {
+      "ConnectionString": "${SlackConnString}",
+      "QueueName": "${SlackQueueName}"
+    },
+    "ThrottlingLimitSeconds": "${SlackThrottlingLimitSeconds}"
+  }
+}
