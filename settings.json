@@ -4,7 +4,7 @@
     "Db": 
     {
       "BlobConnectionString": "${PdfGeneratorServiceBlobConnStr}:[AzureBlobStorage]",
-      "LogsConnString": "${PdfGeneratorServiceLogsConnStr}:[Logs, [AzureTableStorage]"
+      "LogsConnString": "${PdfGeneratorServiceLogsConnStr}:[Logs, AzureTableStorage]"
     },
     "PdfBlobContainer": "${PdfGeneratorServiceBlobContainer}:[AzureBlobStorage]"
   },
