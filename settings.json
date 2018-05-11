@@ -3,7 +3,7 @@
   {
     "Db": 
     {
-      "BlobConnectionString": "${PdfGeneratorServiceConnStr}",
+      "BlobConnectionString": "${PdfGeneratorServiceBlobConnStr}",
       "LogsConnString": "${PdfGeneratorServiceLogsConnStr}"
     },
     "PdfBlobContainer": "${PdfGeneratorServiceBlobContainer}"
