@@ -3,18 +3,18 @@
   {
     "Db": 
     {
-      "BlobConnectionString": "${PdfGeneratorServiceBlobConnStr}",
-      "LogsConnString": "${PdfGeneratorServiceLogsConnStr}"
+      "BlobConnectionString": "${PdfGeneratorServiceBlobConnStr}:[AzureBlobStorage]",
+      "LogsConnString": "${PdfGeneratorServiceLogsConnStr}:[Logs, [AzureTableStorage]"
     },
-    "PdfBlobContainer": "${PdfGeneratorServiceBlobContainer}"
+    "PdfBlobContainer": "${PdfGeneratorServiceBlobContainer}:[AzureBlobStorage]"
   },
   "SlackNotifications": 
   {
     "AzureQueue": 
     {
-      "ConnectionString": "${SlackConnString}",
-      "QueueName": "${SlackQueueName}"
+      "ConnectionString": "${SlackConnString}:[AzureTableStorage]",
+      "QueueName": "${SlackQueueName}:[Name]"
     },
-    "ThrottlingLimitSeconds": "${SlackThrottlingLimitSeconds}"
+    "ThrottlingLimitSeconds": "${SlackThrottlingLimitSeconds}:[Timestamp]"
   }
 }
